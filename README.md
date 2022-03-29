@@ -1,2 +1,2 @@
-# Hotspot-Detection-RF_Classifier
+# Hotspot Detection with Random Forest Classifier and Google Earth Engine
  Source Code and Documentation
