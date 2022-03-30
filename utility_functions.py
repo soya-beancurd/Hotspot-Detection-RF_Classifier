@@ -12,12 +12,12 @@ from matplotlib import gridspec
 import pandas as pd
 
 
-#%% Extracting input data and appending it into a single target and response variable
+#%% Extracting input data and appending it into a single predictor and target variable
 def extractData(dataDir, setting, settingRatio = None, totalImages = 86, combinedHotspot = False):
     
     '''
-    Function to extract and append input image (fire and/or lava images) into a NumPy arrays for the target variables (X)
-    and the respone variables (y), along with associated feature (column) names of X.
+    Function to extract and append input image (fire and/or lava images) into a NumPy arrays for the predictor variables (X)
+    and the target variables (y), along with associated feature (column) names of X.
     
     Inputs:
         dataDir --> Directory of the folder containing lava and fire image subfolders (In which each subfolder contains all
@@ -28,14 +28,14 @@ def extractData(dataDir, setting, settingRatio = None, totalImages = 86, combine
         settingRatio --> Ratio for each tuple in setting with respect to totalImages. Must be defined when there is more
                          than 1 component in setting. Defined as a list of integers for each setting in sequence (i.e., if
                          we want our setting to be 1-S2F and 2-LS8, we define settingRatio as [1,2]). Defaults to None.
-        totalImages --> Total number of input image to consider when building the target and response variables (X & y).
+        totalImages --> Total number of input image to consider when building the predictor and target variables (X & y).
                         Defaults to 86.
         combinedHotspot --> Boolean variable that decides if lava and fire labels in y should all be converted to a single
                             label (hotspot) if set to True. Defauts to False.
         
     Outputs:
-        X --> Target variable matrix of size (all labelled pixels, 10).
-        y --> Response variable vector of size (all labelled pixels,)
+        X --> Predictor variable matrix of size (all labelled pixels, 10).
+        y --> Target variable vector of size (all labelled pixels,)
         features --> NumPy array of feature names corresponding to each of the 10 columns of X.
         
     '''
@@ -101,10 +101,10 @@ def extractData(dataDir, setting, settingRatio = None, totalImages = 86, combine
                 # Number of bands (features) to consider.
                 nBands = rasterfile.count
 
-                # X (features / target variables) and y (response variables).
+                # X (features / predictor variables) and y (target variables).
                 if childDirIdx == 0 and satelliteIdx == 0:
                     X = np.array([], dtype = np.float16).reshape(0,nBands) # Feature array is 0 x nBands long (prevent error when appending)
-                    y = np.array([], dtype='str') # Specific for string labelled response variables (i.e., fire, cloud, etc).
+                    y = np.array([], dtype='str') # Specific for string labelled target variables (i.e., fire, cloud, etc).
 
                 # Getting all the polygon values from the geometry column 
                 geometryList = shapefile['geometry'].values
@@ -618,8 +618,8 @@ def plotSpectra(X, y, classSet, settingStr, features, plotShow = True, saveFig =
     Function to plot spectral profile summary (average & min-max range) of a set of data.
     
     Inputs:
-        X --> Target variable matrix of size (datapoints, 10).
-        y --> Response variable vector of size (datapoints,)
+        X --> Predictor variable matrix of size (datapoints, 10).
+        y --> Target variable vector of size (datapoints,)
         classSet --> A list of tuples, where each tuple contains (i) the class to plot, and (ii) the color of that class in
                      the resultant plot.
         settingStr --> A single string representing the model's settings (combination of input images). Follows the format
@@ -646,7 +646,7 @@ def plotSpectra(X, y, classSet, settingStr, features, plotShow = True, saveFig =
     for Set in classSet:
         
         if Set[0] not in np.unique(y):
-            raise ValueError('Defined class `ge%s` not found in the response variable y.' % (Set[0]))
+            raise ValueError('Defined class `ge%s` not found in the target variable y.' % (Set[0]))
         
         # Only requiring the class type in this loop, for which it is used to index out corresponding pixelData from X.
         Class = Set[0]
